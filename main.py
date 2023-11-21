@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import os
 import webbrowser
+from youtubesearchpython import VideosSearch
 
 
 # Function to speak out the given text
@@ -25,20 +26,20 @@ def take():
             return "I am unable to process your request at the moment."
 
 
-# Function to extract the word following 'open' in a given phrase
-def word_after_open(phrase):
+# Function to extract the phrase following a command in a given sentence
+def word_after_command(phrase, command):
     words = phrase.split()
-    if 'open' in words:
-        open_index = words.index('open')
-        if open_index + 1 < len(words):
-            return words[open_index + 1]
+    if command in words:
+        index = words.index(command)
+        if index + 1 < len(words):
+            return ' '.join(words[index + 1:])  # Get all words after the command as a single string
     return None
 
 
 if __name__ == '__main__':
-    print('PyCharm')
     # Jarvis introduction
-    say("Hello, I am Jarvis AI.")
+    print("Hello, I am Jarvis AI.")
+    say("Hello, I am Jarvis A.I.")
     while True:
         print("Listening...")
         # Capture user input through microphone
@@ -47,7 +48,7 @@ if __name__ == '__main__':
         # Check if the query contains the word 'open'
         if "open" in query:
             # Extract the word following 'open' to identify the website
-            site = word_after_open(query)
+            site = word_after_command(query, "open")
             if site:
                 # Open the specified website in the default browser
                 print(f"Opening {site}...")
@@ -56,3 +57,20 @@ if __name__ == '__main__':
             else:
                 # If no website specified after 'open'
                 print("Please specify a website.")
+
+        elif "play" in query:
+            song = word_after_command(query, "play")
+            if song:
+                print(f"Searching for {song} on YouTube...")
+                say(f"Playing {song} on YouTube")
+                # Search for the song on YouTube
+                videosSearch = VideosSearch(song, limit=1)
+                videosResult = videosSearch.result()
+                if videosResult:
+                    first_video_url = videosResult['result'][0]['link']
+                    print(f"Playing {first_video_url}...")
+                    webbrowser.open(first_video_url)  # Open the first video URL in the default browser
+                else:
+                    print("No results found.")
+            else:
+                print("Please specify a song to play.")
